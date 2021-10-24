@@ -4,6 +4,7 @@ import 'package:recipe_app/custom_theme.dart';
 import 'views/home_view.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 

@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:path/path.dart';
 import 'package:recipe_app/model/recipe_model.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -14,7 +16,9 @@ class BookmarkService {
   String columnVideo = 'video';
   String columnIngredents = 'ingredents';
 
-  Future open(String path) async {
+  Future open() async {
+    String dbPath = await getDatabasesPath();
+    String path = join(dbPath, '_recipe.db');
     db = await openDatabase(path, version: 1,
         onCreate: (Database db, int version) async {
       await db.execute('''
@@ -31,6 +35,7 @@ create table $tableRecipe (
   }
 
   Future<RecipeModel> insert(RecipeModel recipeModel) async {
+    // recipeModel.ingredents = recipeModelToJson(recipeModel.ingredents) as List<Ingredent>;
     recipeModel.id = await db.insert(tableRecipe, recipeModel.toJson());
     return recipeModel;
   }

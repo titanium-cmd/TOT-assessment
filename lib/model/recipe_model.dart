@@ -1,9 +1,8 @@
 // To parse this JSON data, do
 //
-//     final recipeModel = recipeModelFromJson(jsonString);
+// final recipeModel = recipeModelFromJson(jsonString);
 
 import 'dart:convert';
-
 List<RecipeModel> recipeModelFromJson(String str) => List<RecipeModel>.from(
     json.decode(str).map((x) => RecipeModel.fromJson(x)));
 
@@ -21,7 +20,7 @@ class RecipeModel {
     required this.ingredents,
   });
 
-  int id;
+  int? id;
   String title;
   String category;
   double rate;
@@ -47,7 +46,8 @@ class RecipeModel {
         "rate": rate,
         "image": image,
         "video": video,
-        "ingredents": List<dynamic>.from(ingredents.map((x) => x.toJson())),
+        "ingredents": [],
+        // "ingredents": List<dynamic>.from(ingredents.map((x) => x.toJson())),
       };
 }
 
@@ -60,12 +60,12 @@ class Ingredent {
   String name;
   String quantity;
 
-  factory Ingredent.fromJson(Map<String, dynamic> json) => Ingredent(
+  factory Ingredent.fromJson(Map json) => Ingredent(
         name: json["name"],
         quantity: json["quantity"],
       );
 
-  Map<String, dynamic> toJson() => {
+  Map toJson() => {
         "name": name,
         "quantity": quantity,
       };

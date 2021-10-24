@@ -1,9 +1,59 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:recipe_app/controller/bookmark_manager.dart';
+import 'package:recipe_app/model/recipe_model.dart';
+import 'package:recipe_app/service/bookmark_recipe.dart';
+import 'package:recipe_app/views/video_player_view.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
-class DetialViewExample extends StatelessWidget {
-  const DetialViewExample({Key? key}) : super(key: key);
+class DetialViewExample extends StatefulWidget {
+  final RecipeModel recipe;
+
+  const DetialViewExample({
+    Key? key, 
+    required this.recipe
+  }) : super(key: key);
+
+  @override
+  State<DetialViewExample> createState() => _DetialViewExampleState();
+}
+
+class _DetialViewExampleState extends State<DetialViewExample> {
+  final BookmarkManager _bookmarkManager = BookmarkManager();
+  final BookmarkService _bookmarkService = BookmarkService();
+  bool isLoading = false;
+
+  addBookmark()async{
+    setState(() {
+      isLoading = true;
+    });
+    bool isAdded = await _bookmarkManager.addBookmark(widget.recipe);
+    setState(() {
+      isLoading = false;
+    });
+    if(isAdded){
+      Fluttertoast.showToast(
+        msg: _bookmarkManager.getFeedback(),
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0
+      );
+    }else{
+      Fluttertoast.showToast(
+        msg: _bookmarkManager.getFeedback(),
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,10 +86,17 @@ class DetialViewExample extends StatelessWidget {
                 const Spacer(),
                  CircleAvatar(
                   backgroundColor: Colors.amber,
-                  child: Icon(
-                    Icons.play_arrow,
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    size: 60,
+                  child: GestureDetector(
+                    onTap: (){
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => VideoPlayerView(videoUrl: widget.recipe.video))
+                      );
+                    },
+                    child: Icon(
+                      Icons.play_arrow,
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      size: 60,
+                    ),
                   ),
                   radius: 40,
                 ),
@@ -71,7 +128,7 @@ class DetialViewExample extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          'Title here',
+                          widget.recipe.title,
                           style: Theme.of(context)
                               .textTheme
                               .headline5!
@@ -80,7 +137,7 @@ class DetialViewExample extends StatelessWidget {
                         Row(
                           children: [
                             Text(
-                              'category',
+                              widget.recipe.category,
                               style: Theme.of(context).textTheme.bodyText1,
                             ),
                             const Spacer(),
@@ -92,7 +149,7 @@ class DetialViewExample extends StatelessWidget {
                               width: 5,
                             ),
                             Text(
-                              '5.0',
+                              widget.recipe.rate.toString(),
                               style: Theme.of(context).textTheme.bodyText1,
                             ),
                           ],
@@ -192,28 +249,6 @@ class DetialViewExample extends StatelessWidget {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(
-                                  height: 7,
-                                ),
-                                Row(
-                                  children: [
-                                    Text(
-                                      'Powdered Milk',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyText1!
-                                          .copyWith(
-                                              fontWeight: FontWeight.bold),
-                                    ),
-                                    const Spacer(),
-                                    Text(
-                                      '1 sachet',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyText1,
-                                    ),
-                                  ],
-                                )
                               ],
                             ),
                           ),
@@ -243,8 +278,9 @@ class DetialViewExample extends StatelessWidget {
                         child: BackButton(),
                       ),
                     ),
+                    isLoading ? const Center(child: CircularProgressIndicator.adaptive()):
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () => addBookmark(),
                       child: const Padding(
                         padding: EdgeInsets.all(12.0),
                         child: Icon(Icons.bookmark_border_outlined),
